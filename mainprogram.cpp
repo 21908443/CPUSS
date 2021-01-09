@@ -2,44 +2,8 @@
 #include<stdio.h>
 #include<conio.h>
 #define max 40
- int main(){
-	
-	int i,j,n,bt[max],at[max],wt[max],tat[max],temp[max];
-	 float awt =0,atat=0;
-	 
-	 
-	 
-	 cout<<"Enter the nomber of process"<<endl;
-	 cin>>n;
-	 cout<<"Enter the burst time of the process"<<endl;
-	 for(i=0;i<n;i++)
-	  cin>>bt[i];
-	  cout<<"Enter the Arrival time of the process"<<endl;
-	  for(i=0;i<n;i++)
-	    cin>>at[i];
-	temp[0]=0;
-	cout<<"The process \t burst time \t arrival time\t waiting time \t turn around "<<endl;
-	 for(i=0;i<n;i++){
-	 	wt[i]=0
-	 	tat[i]=0;
-	 	temp[i+1] = temp[i]+bt[i];
-	 	wt[i]=temp[i]-at[i];
-	 	tat[i]=wt[i]+bt[i];
-	 	awt[i]=awt+wt[i];
-	 	atat[i]=atat+tat[i];
-	 	cout<<i+1<<" \n"<<bt[i]<<" \n"<<at[i]<<"\n"<<wt[i]<<"\n"<<tat[i]<<endl;
-	 }
-	 awt = awt/n;
-	 atat = atat /n;
-	 cout<<"The average wating time = "<<atw<<endl;
-	 cout<<"The average turn around = "<<atat<<endl;
-	 
-	    
-	
-	
-	return 0;
-}
-////////////////////////////////////////////////////////////
+using namespace std;
+
 
 #include<stdio.h>
 #include<stdlib.h>
