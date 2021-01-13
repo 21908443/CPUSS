@@ -15,10 +15,10 @@ queue <Proc> Input;
 queue <Proc> Output;											
 queue <Proc> Printer;											
 	
-pthread_t tid1, tid2, tid3;										
+pthread_t p1, p2, p3;										
 
 
-void* InputQueue(void* arg)
+void* inQ(void* arg)
 {
 	Proc P2;
 	while (1)
@@ -27,12 +27,12 @@ void* InputQueue(void* arg)
 		{
 			P2=Input.front();
 			Input.pop();
-			int sleeper=rand()%11+15;							//getting the duration of Input by generating a ramdom number
+			int sleeper=rand()%11+15;							
 			cout<<P2.Proc_num<<" now will perform Input I/O of "<<sleeper<<" seconds\n";
 			sleep(sleeper);
 			cout<<P2.Proc_num<<" has now successfully performed Input I/O for "<<sleeper<<" seconds\n";
 			cout<<endl<<endl;
-			cout<<"Now "<<P2.Proc_num<<" going to ready\n";					//Now Proc will go back to ready state
+			cout<<"Now "<<P2.Proc_num<<" going to ready\n";					
 			int pipe2_opener = open("block_to_ready", O_WRONLY);
 			write(pipe2_opener, &P2, sizeof(P2));
 			close(pipe2_opener);	
@@ -41,7 +41,7 @@ void* InputQueue(void* arg)
 	pthread_exit(NULL);
 }
 
-void* OutputQueue(void* arg)
+void* outQ(void* arg)
 {
 	Proc P2;
 	while (1)
@@ -50,21 +50,20 @@ void* OutputQueue(void* arg)
 		{
 			P2 = Output.front();
 			Output.pop();
-			int sleeper=rand()%11+15;							//getting the duration of Output by generating a ramdom number
+			int sleeper=rand()%11+15;							
 			cout<<P2.Proc_num<<" now will perform Output I/O of "<<sleeper<<" seconds\n";
 			sleep(sleeper);
 			cout<<P2.Proc_num<<" has now successfully performed Output I/O for "<<sleeper<<" seconds\n";
 			cout<<endl<<endl;
 			cout<<"Now "<<P2.Proc_num<<" going to ready\n";
-			int pipe2_opener = open("block_to_ready", O_WRONLY);				//Now Proc will go back to ready state
-			write(pipe2_opener, &P2, sizeof(P2));
+			int pipe2_opener = open("block_to_ready", O_WRONLY);				
 			close(pipe2_opener);	
 		}
 	}
 	pthread_exit(NULL);
 }
 
-void* PrinterQueue(void* arg)
+void* pQ(void* arg)
 {
 	Proc P2;
 	while (1)
@@ -73,13 +72,13 @@ void* PrinterQueue(void* arg)
 		{
 			P2=Printer.front();
 			Printer.pop();
-			int sleeper=rand()%11+15;						//getting the duration of Printer by generating a ramdom number
+			int sleeper=rand()%11+15;						
 			cout<<P2.Proc_num<<" now will perform Printer I/O of "<<sleeper<<" seconds\n";
 			sleep(sleeper);
 			cout<<P2.Proc_num<<" has now successfully performed Printer I/O for "<<sleeper<<" seconds\n";
 			cout<<endl<<endl;
 			cout<<"Now "<<P2.Proc_num<<" going to ready\n";
-			int pipe2_opener = open("block_to_ready", O_WRONLY);				//Now Proc will go back to ready state
+			int pipe2_opener = open("block_to_ready", O_WRONLY);			
 			write(pipe2_opener, &P2, sizeof(P2));
 			close(pipe2_opener);	
 		}
@@ -89,16 +88,16 @@ void* PrinterQueue(void* arg)
 
 int main()
 {
-	pthread_create(&tid1, NULL, InputQueue, NULL);
-	pthread_create(&tid2, NULL, OutputQueue, NULL);
-	pthread_create(&tid3, NULL, PrinterQueue, NULL);
+	pthread_create(&p1, NULL, inQ, NULL);
+	pthread_create(&p2, NULL, outQ, NULL);
+	pthread_create(&p3, NULL, pQ, NULL);
  
-    	Proc P2;											//temporary Proc for holding data from the pipe
+    	Proc P2;											
     	int reading, waiter, pipe2_opener;
-    	srand(time(NULL));										//for random number generation
+    	srand(time(NULL));										
     	reading = -1;
     	int pipe4_opener = open("run_to_block",O_RDONLY | O_NONBLOCK);
-    	while (1)											//infinte loop for checking the pipes continuously
+    	while (1)											
     	{
     		reading = read(pipe4_opener, &P2, sizeof(P2));
 		while ( reading == -1)
@@ -122,7 +121,7 @@ int main()
 		}
 		else
 		{
-			if (P2.iotype == 1)								//looking on the type of input
+			if (P2.iotype == 1)								
 				Input.push(P2);
 			else if (P2.iotype == 2)
 				Output.push(P2);

@@ -1,27 +1,27 @@
 #include <stdio.h> 
 #include <unistd.h> 
-#include <fcntl.h> // library for fcntl function 
+#include <fcntl.h> 
 #include <iostream>
 #include <string>
 #include <pthread.h>
 #include "Queue.h"
 #include <queue>
 using namespace std;
-pthread_t tid1;								
-int seconds =0;											//variable for implementing clock
-int avg_wait=0, avg_TAT=0, no_of_procs=0, throughput=0;							//for calculating throughput and cumulative waiting and turn around time
-void* clock(void* arg)										//thread for implemeting clock
+pthread_t p1;								
+int sec =0;											
+int average_wait=0, average_tat=0, number_process=0, thr_put=0;					
+void* clock(void* arg)										
 {
 	while (1)
 	{
 		sleep(1);
-		seconds++;
-		if (seconds % 30 == 0)								//after every 30 seconds write current stats in the file
+		sec++;
+		if (sec % 30 == 0)								
 		{
 			int last_file = open("processes_stat.txt", O_RDWR | O_CREAT | O_APPEND, 0777 );
 			dup2(last_file, 1);
-			cout<<"Throughput = "<<throughput<<"-------------";
-			cout<<" Avg waiting time = "<<(avg_wait/no_of_procs)<<"----------------avg TAT = "<<(avg_TAT/no_of_procs)<<" at seconds="<<seconds<<endl;
+			cout<<"thr_put = "<<thr_put<<"-------------";
+			cout<<" Avg waiting time = "<<(average_wait/number_process)<<"----------------average time around = "<<(average_tat/number_process)<<" at sec="<<sec<<endl;
 			close(last_file);
 		}
 	}
@@ -30,10 +30,10 @@ void* clock(void* arg)										//thread for implemeting clock
 
 int main()
 {
-	pthread_create(&tid1, NULL, clock, NULL);
-	int last_file = open("processes_stat.txt", O_TRUNC | O_CREAT, 0777 );					//creating file to maintain the stats
+	pthread_create(&p1, NULL, clock, NULL);
+	int last_file = open("processes_stat.txt", O_TRUNC | O_CREAT, 0777 );	
 	close(last_file);
-	Proc P2;												//temporary Proc for holding the data from pie
+	Proc P2;												
     	int reading = -1, current_screen;
     	int pipe5_opener = open("run_to_exit",O_RDONLY | O_NONBLOCK);						
     	for(int i=0; 1; i++)
@@ -56,15 +56,15 @@ int main()
 		}
 		if ( reading != 0 )
 		{
-			no_of_procs++;									//one more Proc has completed execution
-			int turn_around = P2.exit_time - P2.arrival_time;				//updating cumulative values
-			avg_TAT += turn_around;
-			avg_wait += turn_around - P2.burst_time;
-			throughput ++;
-			last_file = open("processes_stat.txt", O_RDWR | O_APPEND, 0777 );		//here the output will be saved of the exit processes
-			current_screen = dup(1);							//for the sake of output redirection
-			dup2(last_file, 1);								//now cout will write in the txt file
-//----------------------writing contenst on file--------------------------------------------------------------------------------------------------
+			number_process++;									
+			int turn_around = P2.exit_time - P2.arrival_time;				
+			average_tat += turn_around;
+			average_wait += turn_around - P2.burst_time;
+			thr_put ++;
+			last_file = open("processes_stat.txt", O_RDWR | O_APPEND, 0777 );		
+			current_screen = dup(1);							
+			dup2(last_file, 1);								
+
 			cout<<"We received following Proc in the exit state "<<endl;
 			cout<<"Recieved Proc = "<<P2.Proc_num<<endl;
 			cout<<"Algorithm Name = "<<P2.algo<<endl;
@@ -72,7 +72,7 @@ int main()
 			cout<<"Burst Time = "<<P2.burst_time<<endl;
 			cout<<"Waiting Time = "<<(turn_around-P2.burst_time)<<endl;
 			cout<<"Turnaround Time = "<<turn_around<<endl;
-			dup2(current_screen, 1);							//now cout will write on terminal
+			dup2(current_screen, 1);
 			close(last_file);
 
 		}
